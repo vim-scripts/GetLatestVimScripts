@@ -1,0 +1,130 @@
+*getlatestvimscripts.txt*	Get the Latest VimScripts	Aug 20, 2004
+
+Authors:  Charles E. Campbell, Jr.  <NdrOchip@ScampbellPfamilyA.Mbiz>
+	  (remove NOSPAM from the email address)
+
+==============================================================================
+1. GetLatestVimScripts -- Getting Started	*getlatestvimscripts-start*
+
+	The last step, that of renaming/moving the GetLatetsVimScripts.dist
+	file, is for those who have just downloaded GetLatestVimScripts.tar.bz2
+	for the first time.  The GetLatestVimScripts.dist file serves as an
+	example and a template for your own personal list.  Feel free to remove
+	all the scripts mentioned within it; the "important" part of it is the
+	first two lines.
+
+    Your computer needs to have wget for GetLatestVimScripts to do its work.
+
+	1. Unix:
+		cd $HOME/.vim
+		bunzip2 GetLatestVimScripts.tar.bz2
+		tar -oxvf GetLatestVimScripts.tar
+		cd GetLatest
+		mv GetLatestVimScripts.dist GetLatestVimScripts.dat
+	
+	2. Windows:
+		cd
+		cd vimfiles
+		bunzip2 GetLatestVimScripts.tar.bz2
+		tar -oxvf GetLatestVimScripts.tar
+		cd GetLatest
+		ren GetLatestVimScripts.dist GetLatestVimScripts.dat
+	
+
+==============================================================================
+2. GetLatestVimScripts Usage				*getlatestvimscripts*	*glvs*
+
+	While in vim, type
+
+		:GetLatestVimScripts
+
+	This command will examine .../GetLatest/GetLatestVimScripts.dat,
+	pulling down the scripts listed therein if they're out of date.
+	The GetLatestVimScripts.dat file will then be updated to reflect
+	the downloading status.
+
+	Scripts which have been downloaded will appear in the .../GetLatest
+	subdirectory.
+
+	GetLatestVimScripts will search along the runtimepath for the
+	/GetLatest subdirectory.  The first such directory found will
+	be the one used.
+
+
+==============================================================================
+3. GetLatestVimScripts Data File		*getlatestvimscripts-data* *glvs-data*
+
+	The Data file has a header which should appear as:
+
+		ScriptID SourceID Filename
+		--------------------------
+
+	Below that is a list of two columns of numbers and some text describing
+	the associated script.
+
+	The first number on each line is the script's ScriptID.  When you're about
+	to use a web browser to look at scripts on http://vim.sf.net/, just before
+	you click on the script's link, you'll see a line resembling
+
+    	http://vim.sourceforge.net/scripts/script.php?script_id=40
+
+    The "40" happens to be ScriptID that GetLatestVimScripts needs to download
+	the associated page.
+
+	Setting the SourceID to 1 insures that GetLatestVimScripts will download
+	the associated script.  The SourceID is extracted by GetLatestVimScripts
+	from the script's page on vim.sf.net; if its greater than the one stored
+	in the GetLatestVimScripts.dat file, the script will be downloaded.
+
+
+==============================================================================
+4. GetLatestVimScripts Algorithm	*getlatestvimscripts-algorithm* *glvs-alg*
+
+    The Vim sourceforge page dynamically creates a page keying off the
+	so-called script-id.  Within the webpage of
+
+    	http://vim.sourceforge.net/scripts/script.php?script_id=40
+
+    is a line specifying the latest source-id (src_id).  The source identifier
+	numbers are always increasing, hence if the src_id is greater than the one
+	recorded for the script in GetLatestVimScripts then its time to download a
+	newer copy of that script.
+
+    GetLatestVimScripts will then download the script and update its internal
+	database of script ids, source ids, and scriptnames.
+
+
+==============================================================================
+5. GetLatestVimScripts History		*getlatestvimscripts-history* *glvs-hist*
+
+	v10 Apr 19, 2004 : * moved history from script to doc
+	                   * GetLatestVimScripts is now a plugin:
+					     :GetLatestVimScripts command
+						 (runtimepath)/GetLatest/GetLatestVimScripts.dat
+	v9  Jan 23, 2004 : windows (win32/win16/win95) will use
+	                   double quotes ("") whereas other systems will use
+	                   single quotes ('') around the urls in calls via wget
+	v8  Dec 01, 2003 : makes three tries at downloading
+	v7  Sep 02, 2003 : added error messages if "Click on..." or "src_id="
+	                   not found in downloaded webpage
+	                   Uses t_ti, t_te, and rs to make progress visible
+	v6  Aug 06, 2003 : final status messages now display summary of work
+	                   ( "Downloaded someqty scripts" or
+	                     "Everything was current")
+	                   Now GetLatestVimScripts is careful about downloading
+	                   GetLatestVimScripts.vim itself!
+	                   (goes to <NEW_GetLatestVimScripts.vim>)
+	v5  Aug 04, 2003 : missing an endif near bottom
+	v4  Jun 17, 2003 : redraw! just before each "considering" message
+	v3  May 27, 2003 : Protects downloaded files from errant shell
+	                   expansions with single quotes: '...'
+	v2  May 14, 2003 : extracts name of item to be obtained from the
+	                   script file.  Uses it instead of comment field
+	                   for output filename; comment is used in the
+	                   "considering..." line and is now just a comment!
+	                   * Fixed a bug: a string-of-numbers is not the
+	                     same as a number, so I added zero to them
+	                     and they became numbers.  Fixes comparison.
+
+==============================================================================
+vim:tw=78:ts=4:ft=help

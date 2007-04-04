@@ -1,8 +1,8 @@
 " ---------------------------------------------------------------------
 " getscript.vim
 "  Author:	Charles E. Campbell, Jr.
-"  Date:	Oct 13, 2006
-"  Version:	22
+"  Date:	Nov 27, 2006
+"  Version:	23
 "  Installing:	:help glvs-install
 "  Usage:	:help glvs
 "
@@ -22,7 +22,7 @@ set cpo&vim
 if exists("g:loaded_getscript")
  finish
 endif
-let g:loaded_getscript= "v22"
+let g:loaded_getscript= "v23"
 
 " ---------------------------------------------------------------------
 "  Global Variables: {{{1
@@ -37,13 +37,19 @@ if !exists("g:GetLatestVimScripts_wget")
   let g:GetLatestVimScripts_options = ""
  endif
 endif
+
+" options that wget and curl require:
 if !exists("g:GetLatestVimScripts_options")
  if g:GetLatestVimScripts_wget == "wget"
   let g:GetLatestVimScripts_options= "-q -O"
  elseif g:GetLatestVimScripts_wget == "curl"
   let g:GetLatestVimScripts_options= "-s -O"
+ else
+  let g:GetLatestVimScripts_options= ""
  endif
 endif
+
+" by default, allow autoinstall lines to work
 if !exists("g:GetLatestVimScripts_allowautoinstall")
  let g:GetLatestVimScripts_allowautoinstall= 1
 endif
@@ -107,33 +113,43 @@ fun! s:GetOneScript(...)
   if a:0 >= 3
    let scriptid = a:1
    let srcid    = a:2
-   let cmmnt    = a:3
+   let fname    = a:3
+   let cmmnt    = ""
 "   call Decho("scriptid<".scriptid.">")
 "   call Decho("srcid   <".srcid.">")
-"   call Decho("cmmnt   <".cmmnt.">")
+"   call Decho("fname   <".fname.">")
   else
    let curline  = getline(".")
-   let parsepat = '^\s*\(\d\+\)\s\+\(\d\+\)\s\+\(.\{-}\)$'
+   if curline =~ '^\s*#'
+"    call Dret("GetOneScript : skipping a pure comment line")
+    return
+   endif
+   let parsepat = '^\s*\(\d\+\)\s\+\(\d\+\)\s\+\(.\{-}\)\(\s*#.*\)\=$'
    try
     let scriptid = substitute(curline,parsepat,'\1','e')
    catch /^Vim\%((\a\+)\)\=:E486/
-   	let scriptid= 0
+    let scriptid= 0
    endtry
    try
     let srcid    = substitute(curline,parsepat,'\2','e')
    catch /^Vim\%((\a\+)\)\=:E486/
-   	let srcid= 0
+    let srcid= 0
    endtry
    try
-    let cmmnt    = substitute(curline,parsepat,'\3','e')
+    let fname= substitute(curline,parsepat,'\3','e')
    catch /^Vim\%((\a\+)\)\=:E486/
-   	let cmmnt= ""
+    let fname= ""
+   endtry
+   try
+    let cmmnt= substitute(curline,parsepat,'\4','e')
+   catch /^Vim\%((\a\+)\)\=:E486/
+    let cmmnt= ""
    endtry
 "   call Decho("curline <".curline.">")
 "   call Decho("parsepat<".parsepat.">")
 "   call Decho("scriptid<".scriptid.">")
 "   call Decho("srcid   <".srcid.">")
-"   call Decho("cmmnt   <".cmmnt.">")
+"   call Decho("fname   <".fname.">")
   endif
 
   if scriptid == 0 || srcid == 0
@@ -144,15 +160,15 @@ fun! s:GetOneScript(...)
   endif
 
   let doautoinstall= 0
-  if cmmnt =~ ":AutoInstall:"
-"   call Decho("cmmnt<".cmmnt."> has :AutoInstall:...")
-   let aicmmnt= substitute(cmmnt,'\s\+:AutoInstall:\s\+',' ','')
+  if fname =~ ":AutoInstall:"
+"   call Decho("fname<".fname."> has :AutoInstall:...")
+   let aicmmnt= substitute(fname,'\s\+:AutoInstall:\s\+',' ','')
 "   call Decho("aicmmnt<".aicmmnt."> s:autoinstall=".s:autoinstall)
    if s:autoinstall != ""
     let doautoinstall = g:GetLatestVimScripts_allowautoinstall
    endif
   else
-   let aicmmnt= cmmnt
+   let aicmmnt= fname
   endif
 "  call Decho("aicmmnt<".aicmmnt.">: doautoinstall=".doautoinstall)
 
@@ -263,7 +279,7 @@ fun! s:GetOneScript(...)
 	if filereadable(fname)
 "	 call Decho("move <".fname."> to ".s:autoinstall)
 "	 call Decho("DISABLED for testing")
-   	 exe "silent !"g:GetLatestVimScripts_mv." ".fname." ".s:autoinstall
+   	 exe "silent !".g:GetLatestVimScripts_mv." ".fname." ".s:autoinstall
 	 let curdir= escape(substitute(getcwd(),'\','/','ge'),"|[]*'\" #")
 	 exe "cd ".s:autoinstall
 	 if fname =~ '\.bz2$'
@@ -281,6 +297,12 @@ fun! s:GetOneScript(...)
 	 elseif fname =~ '\.tar$'
 "	  call Decho("attempt to untar ".fname)
 	  exe "silent !tar -xvf ".fname
+	 elseif fname =~ '\.vba$'
+"	  call Decho("attempt to handle a vimball: ".fname)
+          1split
+	  exe "e ".fname
+	  so %
+	  q
 	 endif
 	 if fname =~ '.vim$'
 "	  call Decho("attempt to simply move ".fname." to plugin")
@@ -294,7 +316,7 @@ fun! s:GetOneScript(...)
    endif
 
    " update the data in the <GetLatestVimScripts.dat> file
-   let modline=scriptid." ".latestsrcid." ".cmmnt
+   let modline=scriptid." ".latestsrcid." ".fname.cmmnt
    call setline(line("."),modline)
 "   call Decho("modline<".modline."> (updated GetLatestVimScripts.dat file)")
   endif
@@ -443,6 +465,7 @@ fun! getscript#GetLatestVimScripts()
    return
   endtry
   exe "norm! kz\<CR>"
+  redraw!
   let s:msg = ""
   if s:downloads == 1
   let s:msg = "Downloaded one updated script to <".datadir.">"
@@ -459,10 +482,9 @@ fun! getscript#GetLatestVimScripts()
   echomsg s:msg
   " save the file
   if &mod
-   wq
-  else
-   q
+   silent! w!
   endif
+  q
 
   " restore events and current directory
   exe "cd ".escape(substitute(origdir,'\','/','ge'),"|[]*'\" #")

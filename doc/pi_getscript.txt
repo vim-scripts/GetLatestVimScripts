@@ -335,6 +335,8 @@ The AutoInstall process will:
 ==============================================================================
 9. GetLatestVimScripts History		*getscript-history* *glvs-hist* {{{1
 
+v24 Apr 16, 2007 : * removed save&restore of the fo option during script
+                     loading
 v23 Nov 03, 2006 : * ignores comments (#...)
                    * handles vimballs
 v22 Oct 13, 2006 : * supports automatic use of curl if wget is not

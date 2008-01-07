@@ -19,10 +19,8 @@ if &cp || exists("g:loaded_getscriptPlugin")
  endif
  finish
 endif
-let g:loaded_getscriptPlugin = 1
-let s:keepfo                 = &fo
-let s:keepcpo                = &cpo
-set cpo&vim
+let g:loaded_getscriptPlugin = "v28"
+setlocal cpo&vim
 
 " ---------------------------------------------------------------------
 "  Public Interface: {{{1
@@ -30,9 +28,8 @@ com!        -nargs=0 GetLatestVimScripts call getscript#GetLatestVimScripts()
 com!        -nargs=0 GetScripts          call getscript#GetLatestVimScripts()
 silent! com -nargs=0 GLVS                call getscript#GetLatestVimScripts()
 
+" ---------------------------------------------------------------------
 " Restore Options: {{{1
-let &fo = s:keepfo
-let &cpo= s:keepcpo
 
 " ---------------------------------------------------------------------
 " vim: ts=8 sts=2 fdm=marker nowrap

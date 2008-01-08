@@ -1,7 +1,7 @@
 " ---------------------------------------------------------------------
 " getscriptPlugin.vim
 "  Author:	Charles E. Campbell, Jr.
-"  Date:	Jul 18, 2006
+"  Date:	Jan 07, 2008
 "  Installing:	:help glvs-install
 "  Usage:	:help glvs
 "
@@ -19,8 +19,9 @@ if &cp || exists("g:loaded_getscriptPlugin")
  endif
  finish
 endif
-let g:loaded_getscriptPlugin = "v28"
-setlocal cpo&vim
+let g:loaded_getscriptPlugin = "v29"
+let s:keepcpo                = &cpo
+set cpo&vim
 
 " ---------------------------------------------------------------------
 "  Public Interface: {{{1
@@ -30,6 +31,8 @@ silent! com -nargs=0 GLVS                call getscript#GetLatestVimScripts()
 
 " ---------------------------------------------------------------------
 " Restore Options: {{{1
+let &cpo= s:keepcpo
+unlet s:keepcpo
 
 " ---------------------------------------------------------------------
 " vim: ts=8 sts=2 fdm=marker nowrap

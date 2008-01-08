@@ -1,8 +1,8 @@
 " ---------------------------------------------------------------------
 " getscript.vim
 "  Author:	Charles E. Campbell, Jr.
-"  Date:	Jan 07, 2008
-"  Version:	28
+"  Date:	Jan 08, 2008
+"  Version:	29
 "  Installing:	:help glvs-install
 "  Usage:	:help glvs
 "
@@ -17,13 +17,13 @@ if &cp
  finish
 endif
 let s:keepcpo = &cpo
-setlocal cpo&vim
+set cpo&vim
 "DechoTabOn
 
 if exists("g:loaded_getscript")
  finish
 endif
-let g:loaded_getscript= "v28"
+let g:loaded_getscript= "v29"
 
 " ---------------------------
 " Global Variables: {{{1
@@ -584,6 +584,7 @@ endfun
 " ---------------------------------------------------------------------
 " Restore Options: {{{1
 let &cpo= s:keepcpo
+unlet s:keepcpo
 
 " ---------------------------------------------------------------------
 "  Modelines: {{{1
